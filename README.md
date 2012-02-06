@@ -11,7 +11,8 @@ Benefits of this project:
  
 ## Building:
 
-Run `rake`.
+ 1. Install libs: http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=28045
+ 2. Run `rake`.
 
 ## Requirements:
 
