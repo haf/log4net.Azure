@@ -10,7 +10,7 @@ using log4net.Repository.Hierarchy;
 namespace log4net.Azure
 {
 	/// <summary>
-	/// Appender for Windows Azure.
+	/// Appender that writes to the trace.
 	/// </summary>
 	public class AzureAppender : AppenderSkeleton
 	{
