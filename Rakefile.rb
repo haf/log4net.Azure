@@ -89,3 +89,10 @@ nugetpush :az_nuget_push do |nuget|
 end
 
 task :default  => ["env:release", "assemblyinfo", "msbuild", "output", "nugets"]
+
+task :copy_local do
+  packages = Dir.glob 'build/nuget/*.nupkg'
+  packages.each do |p|
+    cp p, 'D:/packages'
+  end
+end
