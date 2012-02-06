@@ -8,3 +8,11 @@ Benefits of this project:
 
  * A real repository that can be pushed to (I haven't been able to find theirs)
  * NuGet-it should be a package.
+ 
+## Building:
+
+Run `rake`.
+
+## Requirements:
+
+ * .Net 4.0
