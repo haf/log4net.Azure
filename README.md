@@ -17,3 +17,11 @@ Benefits of this project:
 ## Requirements:
 
  * .Net 4.0
+
+## Using:
+
+```
+var app = new AzureAppender();
+app.ActivateOptions();
+BasicConfigurator.Configure(app);
+```
