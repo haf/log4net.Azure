@@ -58,9 +58,9 @@ nuspec :az_nuspec do |nuspec|
   nuspec.authors = "#{PROJECTS[:az][:authors]}"
   nuspec.description = "#{PROJECTS[:az][:description]}"
   nuspec.title = "#{PROJECTS[:az][:title]}"
-  # nuspec.projectUrl = 'http://github.com/haf' # TODO: Set this for nuget generation
+  nuspec.projectUrl = 'http://github.com/haf/log4net.Azure'
   nuspec.language = "en-US"
-  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0" # TODO: set this for nuget generation
+  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.requireLicenseAcceptance = "false"
   
   nuspec.output_file = FILES[:az][:nuspec]
