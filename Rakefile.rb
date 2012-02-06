@@ -84,7 +84,7 @@ nugetpush :az_nuget_push do |nuget|
   nuget.command = "#{COMMANDS[:nuget]}"
   nuget.package = "#{File.join(FOLDERS[:nuget], PROJECTS[:az][:nuget_key] + "." + BUILD_VERSION + '.nupkg')}"
 # nuget.apikey = "...."
-  nuget.source = URIS[:nuget_offical]
+ # nuget.source = URIS[:nuget_offical]
   nuget.create_only = false
 end
 
