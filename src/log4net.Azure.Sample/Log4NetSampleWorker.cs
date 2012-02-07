@@ -25,6 +25,10 @@ namespace log4net.Azure.Sample
 			BasicConfigurator.Configure(AzureAppender.New(conf =>
 				{
 					conf.Level = "Debug";
+					conf.ConfigureRepository((repo, mapper) =>
+						{
+							repo.Threshold = mapper("Debug"); // root
+						});
 				}));
 
 			return base.OnStart();
