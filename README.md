@@ -49,7 +49,7 @@ public class Log4NetSampleWorker : RoleEntryPoint
 }
 ```
 
-Assumes your diagnostics connection string is named: `Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString`.
+Assumes your diagnostics connection string is named: `Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString`. It turns out one can't change this in the cscfg files in VS.
 
 Optional Settings:
 
