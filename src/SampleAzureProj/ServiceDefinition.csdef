@@ -5,5 +5,4 @@
 			<Import moduleName="Diagnostics"/>
 		</Imports>
 	</WorkerRole>
-	
 </ServiceDefinition>

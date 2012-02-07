@@ -101,7 +101,7 @@ namespace log4net.Azure
 		{
 			var logString = RenderLoggingEvent(loggingEvent);
 
-			Trace.WriteLine(logString);
+			Trace.Write(logString);
 		}
 
 		public override void ActivateOptions()
