@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using Microsoft.WindowsAzure.Diagnostics;
 using log4net.Appender;
 using log4net.Core;
 using log4net.Layout;
@@ -49,5 +50,12 @@ namespace log4net.Azure
 		/// <param name="repositoryConfigurator">Configurator, takes repository and level mapper :: string -> Level
 		/// that can be used to set <see cref="ILoggerRepository.Threshold"/></param>
 		void ConfigureRepository(Action<ILoggerRepository, Func<string, Level>> repositoryConfigurator);
+
+		/// <summary>
+		/// Configure azure diagnostics - this allows you to configure when and where to things
+		/// get shipped.
+		/// </summary>
+		/// <param name="diagnosticsConfigurator">diagnostics configurator</param>
+		void ConfigureAzureDiagnostics(Action<DiagnosticMonitorConfiguration> diagnosticsConfigurator);
 	}
 }

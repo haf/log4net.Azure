@@ -102,6 +102,15 @@ namespace log4net.Azure
 			repositoryConfigurator(repo, GetLevel);
 		}
 
+		private readonly DiagnosticMonitorConfiguration _defaultDiagnostics
+			= DiagnosticMonitor.GetDefaultInitialConfiguration();
+
+		void AzureAppenderConfigurator.ConfigureAzureDiagnostics(Action<DiagnosticMonitorConfiguration> diagnosticsConfigurator)
+		{
+			if (diagnosticsConfigurator == null) throw new ArgumentNullException("diagnosticsConfigurator");
+			diagnosticsConfigurator(_defaultDiagnostics);
+		}
+
 		#endregion
 
 		protected override void Append(LoggingEvent loggingEvent)
@@ -134,7 +143,7 @@ namespace log4net.Azure
 
 		private DiagnosticMonitorConfiguration ConfigureAzureDiagnostics()
 		{
-			var dmc = DiagnosticMonitor.GetDefaultInitialConfiguration();
+			var dmc = _defaultDiagnostics;
 			dmc.Logs.ScheduledTransferLogLevelFilter = LogLevel.Verbose;
 
 			ScheduleTransfer(dmc, ScheduledTransferPeriod);
