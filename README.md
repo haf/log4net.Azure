@@ -82,13 +82,14 @@ BasicConfigurator.Configure(AzureAppender.New(conf =>
 
 Assumes your diagnostics connection string is named: `Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString`. It turns out one can't change this in the cscfg files in VS.
 
-Optional Settings:
+Optional Settings (that can also be set through the `ConfigureAzureDiagnostics` method call):
 
- * `**Diagnostics.Level**` - [level of logging](http://logging.apache.org/log4net/release/manual/introduction.html), unless configured in code. Accepts { 'Debug', 'Info', 'Warn', 'Error', 'Fatal', 'Off', 'All' }. Defaults to 'Info'.
- * `**Diagnostics.Layout**` - [pattern layout](http://logging.apache.org/log4net/release/sdk/log4net.Layout.PatternLayout.html), unless configured in code. Defaults to `"%timestamp [%thread] %level %logger - %message%newline"`
- * `**Diagnostics.ScheduledTransferPeriod**` - transfer period, unless configured in code. [ms] Defaults to 60000 ms.
- * `**Diagnostics.EventLogs**` - event-logs key. Defaults to `Application!*;System!*`
+ * `Diagnostics.Level` - [level of logging](http://logging.apache.org/log4net/release/manual/introduction.html), unless configured in code. Accepts { 'Debug', 'Info', 'Warn', 'Error', 'Fatal', 'Off', 'All' }. Defaults to 'Info'.
+ * `Diagnostics.Layout` - [pattern layout](http://logging.apache.org/log4net/release/sdk/log4net.Layout.PatternLayout.html), unless configured in code. Defaults to `"%timestamp [%thread] %level %logger - %message%newline"`
+ * `Diagnostics.ScheduledTransferPeriod` - transfer period, unless configured in code. [ms] Defaults to 60000 ms.
+ * `Diagnostics.EventLogs` - event-logs key. Defaults to `Application!*;System!*`
 
 Want a feature? Put up an issue and send a pull request!
 
+Some code from here:
 Ref: http://cloudshaper.wordpress.com/2010/10/30/logging-with-log4net-on-the-azure-platform/
