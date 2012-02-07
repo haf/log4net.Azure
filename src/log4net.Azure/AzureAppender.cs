@@ -23,6 +23,19 @@ namespace log4net.Azure
 		public const string DefaultPatternLayout = "%timestamp [%thread] %level %logger - %message%newline";
 		public const string DefaultEventLogsPattern = "Application!*;System!*";
 
+		public AzureAppender()
+		{
+			// workaround; overriding fails, because it targets its field
+			Layout = GetLayout();
+		}
+
+		private static ILayout GetLayout()
+		{
+			try { return new PatternLayout(RoleEnvironment.GetConfigurationSettingValue(LayoutKey)); }
+			catch (Exception) { return new PatternLayout(DefaultPatternLayout); }
+		}
+
+
 		#region Settings
 
 		private int _scheduledTransferPeriod = GetScheduledTransferPeriod(); // 1 min
@@ -57,23 +70,6 @@ namespace log4net.Azure
 		{
 			get { return _level; }
 			set { _level = value; }
-		}
-
-		private ILayout _layout = GetLayout();
-
-		private static ILayout GetLayout()
-		{
-			try { return new PatternLayout(RoleEnvironment.GetConfigurationSettingValue(LayoutKey)); }
-			catch (Exception) { return new PatternLayout(DefaultPatternLayout); }
-		}
-
-		/// <summary>
-		/// Gets the layout to render strings with.
-		/// </summary>
-		public override ILayout Layout
-		{
-			get { return _layout; }
-			set { _layout = value; }
 		}
 
 		private string _eventLogs = GetEventLogs();
