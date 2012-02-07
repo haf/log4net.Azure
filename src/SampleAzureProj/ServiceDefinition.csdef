@@ -2,7 +2,8 @@
 <ServiceDefinition name="SampleAzureProj" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition">
 	<WorkerRole name="log4net.Azure.Sample" vmsize="Small">
 		<Imports>
-			<Import moduleName="Diagnostics" />
+			<Import moduleName="Diagnostics"/>
 		</Imports>
 	</WorkerRole>
+	
 </ServiceDefinition>
