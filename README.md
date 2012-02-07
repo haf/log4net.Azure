@@ -36,7 +36,7 @@ public class Log4NetSampleWorker : RoleEntryPoint
 				conf.Level = "Debug";
 				conf.ConfigureRepository((repo, mapper) =>
 					{
-						repo.Threshold = mapper("Debug"); // root
+						repo.Threshold = mapper("Debug"); // root (defaults to 'All')
 					});
 			}));
 
