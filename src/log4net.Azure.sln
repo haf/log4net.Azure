@@ -14,6 +14,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{4700DD4A-7
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{A763598B-905B-4E6E-A78E-5F2E21B8EEBD}"
+EndProject
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "SampleAzureProj", "SampleAzureProj\SampleAzureProj.ccproj", "{007DEF92-2444-4110-A47A-63E417024992}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.Azure.Sample", "log4net.Azure.Sample\log4net.Azure.Sample.csproj", "{BE3F573B-BC46-4ECF-8F8D-65A5FA37E503}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,8 +30,19 @@ Global
 		{643CB4BD-28A4-4F99-BB88-D88F779820EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{643CB4BD-28A4-4F99-BB88-D88F779820EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{643CB4BD-28A4-4F99-BB88-D88F779820EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{007DEF92-2444-4110-A47A-63E417024992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{007DEF92-2444-4110-A47A-63E417024992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{007DEF92-2444-4110-A47A-63E417024992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{007DEF92-2444-4110-A47A-63E417024992}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE3F573B-BC46-4ECF-8F8D-65A5FA37E503}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE3F573B-BC46-4ECF-8F8D-65A5FA37E503}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE3F573B-BC46-4ECF-8F8D-65A5FA37E503}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE3F573B-BC46-4ECF-8F8D-65A5FA37E503}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{007DEF92-2444-4110-A47A-63E417024992} = {A763598B-905B-4E6E-A78E-5F2E21B8EEBD}
 	EndGlobalSection
 EndGlobal

@@ -12,24 +12,94 @@ namespace log4net.Azure
 	/// <summary>
 	/// Appender that writes to the trace.
 	/// </summary>
-	public class AzureAppender : AppenderSkeleton
+	public class AzureAppender : AppenderSkeleton, AzureAppenderConfigurator
 	{
-		private const string ConnectionStringKey = "Diagnostics.ConnectionString";
-		private const string LevelKey = "Diagnostics.Level";
-		private const string LayoutKey = "Diagnostics.Layout";
-		private const string ScheduledTransferPeriodKey = "Diagnostics.ScheduledTransferPeriod";
-		private const string EventLogsKey = "Diagnostics.EventLogs";
+		public const string ConnectionStringKey = "Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString";
+		public const string LevelKey = "Diagnostics.Level";
+		public const string LayoutKey = "Diagnostics.Layout";
+		public const string ScheduledTransferPeriodKey = "Diagnostics.ScheduledTransferPeriod";
+		public const string EventLogsKey = "Diagnostics.EventLogs";
 
-		public AzureAppender()
+		public const string DefaultPatternLayout = "%timestamp [%thread] %level %logger - %message%newline";
+		public const string DefaultEventLogsPattern = "Application!*;System!*";
+
+		#region Settings
+
+		private int _scheduledTransferPeriod = GetScheduledTransferPeriod(); // 1 min
+
+		private static int GetScheduledTransferPeriod()
 		{
-			ScheduledTransferPeriod = GetScheduledTransferPeriod();
-			Layout = new PatternLayout(GetLayout());
-			Level = GetLevel();
+			try { return int.Parse(RoleEnvironment.GetConfigurationSettingValue(ScheduledTransferPeriodKey)); }
+			catch (Exception) { return 60000; }
 		}
 
-		public int ScheduledTransferPeriod { get; set; }
+		/// <summary>
+		/// Scheduled transfer period in milliseconds
+		/// </summary>
+		public int ScheduledTransferPeriod
+		{
+			get { return _scheduledTransferPeriod; }
+			set { _scheduledTransferPeriod = value; }
+		}
 
-		public string Level { get; set; }
+		private string _level = GetLevel();
+
+		private static string GetLevel()
+		{
+			try { return RoleEnvironment.GetConfigurationSettingValue(LevelKey); }
+			catch (Exception) { return "Info"; }
+		}
+
+		/// <summary>
+		/// Level of Logging.
+		/// </summary>
+		public string Level
+		{
+			get { return _level; }
+			set { _level = value; }
+		}
+
+		private ILayout _layout = GetLayout();
+
+		private static ILayout GetLayout()
+		{
+			try { return new PatternLayout(RoleEnvironment.GetConfigurationSettingValue(LayoutKey)); }
+			catch (Exception) { return new PatternLayout(DefaultPatternLayout); }
+		}
+
+		/// <summary>
+		/// Gets the layout to render strings with.
+		/// </summary>
+		public override ILayout Layout
+		{
+			get { return _layout; }
+			set { _layout = value; }
+		}
+
+		private string _eventLogs = GetEventLogs();
+
+		private static string GetEventLogs()
+		{
+			try { return RoleEnvironment.GetConfigurationSettingValue(EventLogsKey); }
+			catch (Exception) { return DefaultEventLogsPattern; }
+		}
+
+		/// <summary>
+		/// Gets the semi-colon (;)-separated list of event logs to transfer.
+		/// </summary>
+		public string EventLogs
+		{
+			get { return _eventLogs; }
+			set { _eventLogs = value; }
+		}
+
+		void AzureAppenderConfigurator.ConfigureInner(Action<AzureAppender> appender)
+		{
+			if (appender == null) throw new ArgumentNullException("appender");
+			appender(this);
+		}
+
+		#endregion
 
 		protected override void Append(LoggingEvent loggingEvent)
 		{
@@ -44,94 +114,64 @@ namespace log4net.Azure
 
 			base.ActivateOptions();
 
-			ConfigureAzureDiagnostics();
+			var dmc = ConfigureAzureDiagnostics();
+
+			StartAzureDiagnostics(dmc);
 		}
 
 		private void ConfigureThreshold()
 		{
-			var rootRepository = (Hierarchy) LogManager.GetRepository();
-			Threshold = rootRepository.LevelMap[Level];
+			Threshold = ((Hierarchy) LogManager.GetRepository()).LevelMap[Level];
 		}
 
-		private void ConfigureAzureDiagnostics()
+		private DiagnosticMonitorConfiguration ConfigureAzureDiagnostics()
 		{
-			var traceListener = new DiagnosticMonitorTraceListener();
-			Trace.Listeners.Add(traceListener);
-
 			var dmc = DiagnosticMonitor.GetDefaultInitialConfiguration();
-
-			//set threshold to verbose, what gets logged is controled by the log4net level
 			dmc.Logs.ScheduledTransferLogLevelFilter = LogLevel.Verbose;
 
-			ScheduleTransfer(dmc);
+			ScheduleTransfer(dmc, ScheduledTransferPeriod);
+			ConfigureWindowsEventLogsToBeTransferred(dmc, EventLogs);
 
-			ConfigureWindowsEventLogsToBeTransferred(dmc);
+			return dmc;
+		}
 
+		/// <summary>
+		/// Starts azure diagnostics
+		/// </summary>
+		private static void StartAzureDiagnostics(DiagnosticMonitorConfiguration dmc)
+		{
+			Trace.Listeners.Add(new DiagnosticMonitorTraceListener());
 			DiagnosticMonitor.Start(ConnectionStringKey, dmc);
 		}
 
-		private void ScheduleTransfer(DiagnosticMonitorConfiguration dmc)
+		private static void ScheduleTransfer(DiagnosticMonitorConfiguration dmc, int transferPeriodMs)
 		{
-			var transferPeriod = TimeSpan.FromMinutes(ScheduledTransferPeriod);
+			var transferPeriod = TimeSpan.FromMilliseconds(transferPeriodMs);
 			dmc.Logs.ScheduledTransferPeriod = transferPeriod;
 			dmc.WindowsEventLog.ScheduledTransferPeriod = transferPeriod;
 		}
 
-		private static void ConfigureWindowsEventLogsToBeTransferred(DiagnosticMonitorConfiguration dmc)
+		private static void ConfigureWindowsEventLogsToBeTransferred(DiagnosticMonitorConfiguration dmc, string eventLogs)
 		{
-			var eventLogs = GetEventLogs().Split(';');
-			foreach (var log in eventLogs)
-			{
+			var logs = eventLogs.Split(';');
+			
+			foreach (var log in logs)
 				dmc.WindowsEventLog.DataSources.Add(log);
-			}
 		}
 
-		private static string GetLevel()
+		/// <summary>
+		/// Creates a new AzureAppender and activates its options, allowing you to pass
+		/// a configurator, to configure the appender, before activation.
+		/// </summary>
+		/// <param name="configurator"></param>
+		/// <returns></returns>
+		public static AzureAppender New(Action<AzureAppenderConfigurator> configurator)
 		{
-			try
-			{
-				return RoleEnvironment.GetConfigurationSettingValue(LevelKey);
-			}
-			catch (Exception)
-			{
-				return "Error";
-			}
-		}
-
-		private static string GetLayout()
-		{
-			try
-			{
-				return RoleEnvironment.GetConfigurationSettingValue(LayoutKey);
-			}
-			catch (Exception)
-			{
-				return "%d [%t] %-5p %c [%x] <%X{auth}> - %m%n";
-			}
-		}
-
-		private static int GetScheduledTransferPeriod()
-		{
-			try
-			{
-				return int.Parse(RoleEnvironment.GetConfigurationSettingValue(ScheduledTransferPeriodKey));
-			}
-			catch (Exception)
-			{
-				return 5;
-			}
-		}
-
-		private static string GetEventLogs()
-		{
-			try
-			{
-				return RoleEnvironment.GetConfigurationSettingValue(EventLogsKey);
-			}
-			catch (Exception)
-			{
-				return "Application!*;System!*";
-			}
+			if (configurator == null) throw new ArgumentNullException("configurator");
+			var appender = new AzureAppender();
+			configurator(appender);
+			appender.ActivateOptions();
+			return appender;
 		}
 	}
 }

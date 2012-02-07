@@ -18,10 +18,43 @@ Benefits of this project:
 
  * .Net 4.0
 
-## Using:
+## Using it:
 
 ```
-var app = new AzureAppender();
-app.ActivateOptions();
-BasicConfigurator.Configure(app);
+public class Log4NetSampleWorker : RoleEntryPoint
+{
+	private static readonly ILog _logger = LogManager.GetLogger(typeof (Log4NetSampleWorker));
+
+	public override void Run()
+	{
+		_logger.InfoFormat("{0}'s entry point called", typeof(Log4NetSampleWorker).Name);
+
+		while (true)
+		{
+			Thread.Sleep(10000);
+			_logger.Debug("Working...");
+		}
+	}
+
+	public override bool OnStart()
+	{
+		BasicConfigurator.Configure(AzureAppender.New(conf =>
+			{
+				conf.Level = "Debug";
+			}));
+
+		return base.OnStart();
+	}
+}
 ```
+
+Assumes your diagnostics connection string is named: `Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString`.
+
+Optional Settings:
+
+ * **`Diagnostics.Level`** - [level of logging](http://logging.apache.org/log4net/release/manual/introduction.html), unless configured in code. Accepts { 'Debug', 'Info', 'Warn', 'Error', 'Fatal', 'Off', 'All' }. Defaults to 'Info'.
+ * **`Diagnostics.Layout`** - [pattern layout](http://logging.apache.org/log4net/release/sdk/log4net.Layout.PatternLayout.html), unless configured in code. Defaults to `"%timestamp [%thread] %level %logger - %message%newline"`
+ * **`Diagnostics.ScheduledTransferPeriod`** - transfer period, unless configured in code. [ms] Defaults to 60000 ms.
+ * **`Diagnostics.EventLogs`** - event-logs key. Defaults to `Application!*;System!*`
+
+Want a feature? Put up an issue and send a pull request!
