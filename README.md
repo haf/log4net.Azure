@@ -17,6 +17,7 @@ Benefits of this project:
 ## Requirements:
 
  * .Net 4.0
+ * libs from above
 
 ## Using it:
 
