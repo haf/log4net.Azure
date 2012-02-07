@@ -1,7 +1,9 @@
 using System;
 using System.ComponentModel;
 using log4net.Appender;
+using log4net.Core;
 using log4net.Layout;
+using log4net.Repository;
 
 namespace log4net.Azure
 {
@@ -38,7 +40,14 @@ namespace log4net.Azure
 		/// Lets you configure the 'raw' appender. Avoid using this an instead
 		/// expand upon this interface.
 		/// </summary>
-		/// <param name="appender">Lambda configuring appender.</param>
-		void ConfigureInner(Action<AzureAppender> appender);
+		/// <param name="appenderConfigurator">Lambda configuring appender.</param>
+		void ConfigureInner(Action<AzureAppender> appenderConfigurator);
+
+		/// <summary>
+		/// Configure the repository hosting the appenders.
+		/// </summary>
+		/// <param name="repositoryConfigurator">Configurator, takes repository and level mapper :: string -> Level
+		/// that can be used to set <see cref="ILoggerRepository.Threshold"/></param>
+		void ConfigureRepository(Action<ILoggerRepository, Func<string, Level>> repositoryConfigurator);
 	}
 }

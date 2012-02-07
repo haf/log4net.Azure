@@ -5,6 +5,7 @@ using Microsoft.WindowsAzure.ServiceRuntime;
 using log4net.Appender;
 using log4net.Core;
 using log4net.Layout;
+using log4net.Repository;
 using log4net.Repository.Hierarchy;
 
 namespace log4net.Azure
@@ -95,6 +96,12 @@ namespace log4net.Azure
 			appender(this);
 		}
 
+		void AzureAppenderConfigurator.ConfigureRepository(Action<ILoggerRepository, Func<string, Level>> repositoryConfigurator)
+		{
+			var repo = LogManager.GetRepository();
+			repositoryConfigurator(repo, GetLevel);
+		}
+
 		#endregion
 
 		protected override void Append(LoggingEvent loggingEvent)
@@ -117,7 +124,12 @@ namespace log4net.Azure
 
 		private void ConfigureThreshold()
 		{
-			Threshold = ((Hierarchy) LogManager.GetRepository()).LevelMap[Level];
+			Threshold = GetLevel(Level);
+		}
+
+		private static Level GetLevel(string level)
+		{
+			return ((Hierarchy) LogManager.GetRepository()).LevelMap[level];
 		}
 
 		private DiagnosticMonitorConfiguration ConfigureAzureDiagnostics()
