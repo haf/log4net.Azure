@@ -45,11 +45,36 @@ public class Log4NetSampleWorker : RoleEntryPoint
 }
 ```
 
-Benefits of this project: 
+The configurator gives you access to doing things like this as well;
 
- * A real repository that can be pushed to (I haven't been able to find theirs)
- * NuGet-it should be a package.
- 
+```
+BasicConfigurator.Configure(AzureAppender.New(conf =>
+	{
+		/* in this case we say that appender should be in debug mode
+			* but that we should only transfer logs to storage that is information-level
+			* or above.
+			* 
+			* That doesn't make sense unless you're also doing debugging and want the debug
+			* output in the trace viewer or you have another trace message sink.
+			* 
+			* Please note the wonderful *three* types of logging levels here! Nice. Not to
+			* mention that you can do the equivalent of conf.Level = "Debug" in the cscfg file.
+			*/
+
+		conf.Level = "Debug";
+
+		conf.ConfigureRepository((repo, mapper) =>
+			{
+				repo.Threshold = mapper("Debug"); // root
+			});
+
+		conf.ConfigureAzureDiagnostics(dmc =>
+			{
+				dmc.Logs.ScheduledTransferLogLevelFilter = LogLevel.Information;
+			});
+	}));
+```
+
 ## Building:
 
  1. Install libs: http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=28045
