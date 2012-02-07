@@ -33,8 +33,11 @@ public class Log4NetSampleWorker : RoleEntryPoint
 	{
 		BasicConfigurator.Configure(AzureAppender.New(conf =>
 			{
-				// set anything in this interface instance: conf
 				conf.Level = "Debug";
+				conf.ConfigureRepository((repo, mapper) =>
+					{
+						repo.Threshold = mapper("Debug"); // root
+					});
 			}));
 
 		return base.OnStart();
