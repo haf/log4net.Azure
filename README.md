@@ -78,6 +78,7 @@ BasicConfigurator.Configure(AzureAppender.New(conf =>
 ## Building:
 
  1. Install libs: http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=28045
+ 2. Run 'gem install bundler' (if not already installed)
  2. Run `rake`.
 
 Assumes your diagnostics connection string is named: `Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString`. It turns out one can't change this in the cscfg files in VS.
