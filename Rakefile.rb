@@ -62,7 +62,7 @@ nuspec :az_nuspec do |nuspec|
   nuspec.language = "en-US"
   nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.requireLicenseAcceptance = "false"
-  nuspec.dependency 'log4net', '[1.2.10]'
+  nuspec.dependency 'log4net', '1.2.11'
   nuspec.output_file = FILES[:az][:nuspec]
   nuspec.tags = "log4net azure diagnostics logging log logs management appender target"
   nuspec_copy(:az, "#{PROJECTS[:az][:id]}.{dll,pdb,xml}")
