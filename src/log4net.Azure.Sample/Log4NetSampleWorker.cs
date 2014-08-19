@@ -37,7 +37,6 @@ namespace log4net.Azure.Sample
 						*/
 
 					conf.Level = "Debug";
-
 					conf.ConfigureRepository((repo, mapper) =>
 						{
 							repo.Threshold = mapper("Debug"); // root

@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using Microsoft.WindowsAzure.Diagnostics;
+using Microsoft.WindowsAzure.Diagnostics.Management;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using log4net.Appender;
 using log4net.Core;
 using log4net.Layout;
 using log4net.Repository;
 using log4net.Repository.Hierarchy;
+using Microsoft.WindowsAzure.Storage;
+using LogLevel = Microsoft.WindowsAzure.Diagnostics.LogLevel;
 
 namespace log4net.Azure
 {
@@ -142,8 +145,11 @@ namespace log4net.Azure
 		}
 
 		private DiagnosticMonitorConfiguration ConfigureAzureDiagnostics()
-		{
-			var dmc = _defaultDiagnostics;
+        {
+
+            var roleInstanceDiagnosticManager = GetRoleInstanceDiagnosticManager();
+
+			var dmc = roleInstanceDiagnosticManager.GetCurrentConfiguration();
 			dmc.Logs.ScheduledTransferLogLevelFilter = LogLevel.Verbose;
 
 			ScheduleTransfer(dmc, ScheduledTransferPeriod);
@@ -152,13 +158,26 @@ namespace log4net.Azure
 			return dmc;
 		}
 
-		/// <summary>
+	    private static RoleInstanceDiagnosticManager GetRoleInstanceDiagnosticManager()
+	    {
+	        var connectionString = RoleEnvironment.GetConfigurationSettingValue(ConnectionStringKey);
+	        return new RoleInstanceDiagnosticManager(
+	            connectionString,
+	            RoleEnvironment.DeploymentId,
+	            RoleEnvironment.CurrentRoleInstance.Role.Name,
+	            RoleEnvironment.CurrentRoleInstance.Id);
+	    }
+
+	    /// <summary>
 		/// Starts azure diagnostics
 		/// </summary>
 		private static void StartAzureDiagnostics(DiagnosticMonitorConfiguration dmc)
 		{
 			Trace.Listeners.Add(new DiagnosticMonitorTraceListener());
-			DiagnosticMonitor.Start(ConnectionStringKey, dmc);
+
+	        var roleInstanceDiagnosticManager = GetRoleInstanceDiagnosticManager();
+
+			roleInstanceDiagnosticManager.SetCurrentConfiguration(dmc);
 		}
 
 		private static void ScheduleTransfer(DiagnosticMonitorConfiguration dmc, int transferPeriodMs)
@@ -171,9 +190,14 @@ namespace log4net.Azure
 		private static void ConfigureWindowsEventLogsToBeTransferred(DiagnosticMonitorConfiguration dmc, string eventLogs)
 		{
 			var logs = eventLogs.Split(';');
-			
-			foreach (var log in logs)
-				dmc.WindowsEventLog.DataSources.Add(log);
+
+		    foreach (var log in logs)
+		    {
+                if (!dmc.WindowsEventLog.DataSources.Contains(log))
+                {
+                    dmc.WindowsEventLog.DataSources.Add(log); 
+                }
+		    }
 		}
 
 		/// <summary>
