@@ -7,3 +7,4 @@ _ReSharper*
 build/
 SharedAssemblyInfo.cs
 csx/
+src/packages/
